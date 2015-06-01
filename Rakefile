@@ -1,11 +1,11 @@
 require 'rake'
-require 'httparty'
 require 'ipaddress'
+require 'httparty'
 
 namespace :loris do
   desc "Build Loris docker"
   task :build do
-    sh 'docker build -t "pulibrary/loris" loris/.'
+    sh 'docker build -t "loris/loris" loris/.'
   end
 
   desc "Run Loris docker"
@@ -14,8 +14,8 @@ namespace :loris do
       docker run -d \
         --name dockerwrapper \
         -v $(pwd)/loris/images:/usr/local/share/images \
-        -p 3000:3000 \
-        pulibrary/loris
+        -p 5004:5004 \
+        loris/loris
       docker exec -it \
         dockerwrapper \
         cp -r /opt/loris/tests/img/. /usr/local/share/images/
@@ -34,8 +34,10 @@ namespace :loris do
 
   desc "Test Loris endpoint"
   task :test do
-    host_url = IPAddress::IPv4::extract ENV['DOCKER_HOST']
-    response = HTTParty.get('http://' + host_url.to_s + ":3000/01/02/0001.jp2/info.json")
+    # host_url = IPAddress::IPv4::extract ENV['DOCKER_HOST']
+    puts '*****************************'
+    puts ENV['DOCKER_HOST']
+    response = HTTParty.get('http://localhost:5004/01/02/0001.jp2/info.json')
     puts response.body
   end
 end
