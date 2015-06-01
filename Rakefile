@@ -34,10 +34,13 @@ namespace :loris do
 
   desc "Test Loris endpoint"
   task :test do
-    # host_url = IPAddress::IPv4::extract ENV['DOCKER_HOST']
-    puts '*****************************'
-    puts ENV['DOCKER_HOST']
-    response = HTTParty.get('http://localhost:5004/01/02/0001.jp2/info.json')
+    name = `(docker info | grep 'Name: ' | sed 's/Name: //')`
+    if name['boot2docker']
+      host = `boot2docker ip`
+    else
+      host = 'localhost'
+    end
+    response = HTTParty.get('http://' + host.strip + ':5004/01/02/0001.jp2/info.json')
     puts response.body
   end
 end
